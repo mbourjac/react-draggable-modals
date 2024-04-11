@@ -1,13 +1,14 @@
+import { PositionRandomizer } from '../components/PositionRandomizer';
 import { ProjectModal } from '../components/ProjectModal';
 import { PROJECTS } from './Home.constants';
 
 export const Home = () => {
   return (
-    <section className="flex flex-wrap">
+    <section>
       {PROJECTS.map(({ id, heading, description }) => (
-        <ProjectModal key={id} heading={heading}>
-          {description}
-        </ProjectModal>
+        <PositionRandomizer key={id}>
+          <ProjectModal heading={heading}>{description}</ProjectModal>
+        </PositionRandomizer>
       ))}
     </section>
   );
