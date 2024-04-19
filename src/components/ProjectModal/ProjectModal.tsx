@@ -11,18 +11,20 @@ export const ProjectModal = ({
   id,
   heading,
   description,
+  content,
   position: { zIndex },
 }: ProjectModalProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLElement>(null);
 
   const { handleOnMouseDown } = useProjectModals();
-  const { randomLeft, randomTop } = useRandomPosition(containerRef);
+  const { randomLeft, randomTop } = useRandomPosition(modalRef);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [draggedPosition, setDraggedPosition] = useState<{
     left: string;
     top: string;
   } | null>(null);
+  const [restHeight, setRestHeight] = useState<string | undefined>(undefined);
 
   const variants = {
     inital: {
@@ -34,34 +36,47 @@ export const ProjectModal = ({
       x: draggedPosition ? draggedPosition.left : randomLeft,
       y: draggedPosition ? draggedPosition.top : randomTop,
       width: '25rem',
+      height: restHeight,
     },
     expanded: {
       x: 0,
       y: 0,
       width: '100vw',
-      height: '100vw',
+      height: '100vh',
     },
   };
 
   const handleExpandModal = () => {
     setIsExpanded((prevIsExpanded) => !prevIsExpanded);
+
+    if (isExpanded) return;
+
+    const modal = modalRef.current;
+
+    if (!modal) {
+      throw new Error('modalRef is not assigned');
+    }
+
+    const modalStyle = window.getComputedStyle(modal);
+    const height = modalStyle.height;
+
+    setRestHeight(height);
   };
 
   const handleOnDragEnd = () => {
     if (isExpanded) return;
 
-    const container = containerRef.current;
+    const modal = modalRef.current;
 
-    if (!container) {
+    if (!modal) {
       throw new Error('containerRef is not assigned');
     }
 
-    const elementStyle = window.getComputedStyle(container);
-    const top = parseInt(elementStyle.top, 10);
-    const left = parseInt(elementStyle.left, 10);
+    const modalStyle = window.getComputedStyle(modal);
+    const top = parseInt(modalStyle.top, 10);
+    const left = parseInt(modalStyle.left, 10);
 
-    const transformValues =
-      container.style.transform.match(/[-]?\d*\.?\d+/g) ?? [];
+    const transformValues = modal.style.transform.match(/[-]?\d*\.?\d+/g) ?? [];
 
     const translateX = parseInt(transformValues[0] ?? '0', 10);
     const translateY = parseInt(transformValues[1] ?? '0', 10);
@@ -73,9 +88,9 @@ export const ProjectModal = ({
   };
 
   return (
-    <motion.div
-      ref={containerRef}
-      className="absolute cursor-grab"
+    <motion.article
+      ref={modalRef}
+      className="absolute max-w-full cursor-grab overflow-hidden"
       style={{ zIndex }}
       variants={variants}
       initial="inital"
@@ -92,7 +107,7 @@ export const ProjectModal = ({
         handleOnMouseDown(id);
       }}
     >
-      <article className="h-full max-w-full border-2 border-blue-600 bg-white text-blue-800">
+      <div className="h-full max-w-full border-2 border-blue-600 bg-white text-blue-800">
         <div className="flex border-b-2 border-blue-600">
           <h2 className="grow truncate px-4 py-2 font-semibold uppercase">
             {heading}
@@ -102,8 +117,11 @@ export const ProjectModal = ({
             isModalExpanded={isExpanded}
           />
         </div>
-        <p className="px-4 py-2 text-xl font-medium">{description}</p>
-      </article>
-    </motion.div>
+        <div className="flex h-full flex-col gap-4 overflow-auto px-4 py-2 text-xl font-medium">
+          <p>{description}</p>
+          {isExpanded && <p>{content}</p>}
+        </div>
+      </div>
+    </motion.article>
   );
 };

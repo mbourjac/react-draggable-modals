@@ -6,7 +6,7 @@ export const Home = () => {
   const { projectModals } = useProjectModals(PROJECTS);
 
   return (
-    <section>
+    <section className="h-screen w-screen">
       {projectModals.map((projectModal) => (
         <ProjectModal key={projectModal.id} {...projectModal} />
       ))}
