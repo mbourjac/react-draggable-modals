@@ -1,23 +1,29 @@
-import { useRef, useState } from 'react';
+import { type RefObject, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useElementSize } from '../../hooks/use-element-size';
 import { useProjectModals } from '../../hooks/use-project-modals';
 import { useRandomPosition } from '../../hooks/use-random-position';
 import type { ProjectModal as ProjectModalType } from './ProjectModal.types';
 import { ProjectModalButton } from './ProjectModalButton';
 
-type ProjectModalProps = ProjectModalType;
+type ProjectModalProps<T extends HTMLElement> = ProjectModalType & {
+  containerRef: RefObject<T>;
+};
 
-export const ProjectModal = ({
+export const ProjectModal = <T extends HTMLElement>({
   id,
   heading,
   description,
   content,
   position: { zIndex },
-}: ProjectModalProps) => {
+  containerRef,
+}: ProjectModalProps<T>) => {
   const modalRef = useRef<HTMLElement>(null);
 
   const { handleOnMouseDown } = useProjectModals();
-  const { randomLeft, randomTop } = useRandomPosition(modalRef);
+  const { randomLeft, randomTop } = useRandomPosition(modalRef, containerRef);
+  const { elementWidth: containerWidth, elementHeight: containerHeight } =
+    useElementSize(containerRef);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [draggedPosition, setDraggedPosition] = useState<{
@@ -41,8 +47,8 @@ export const ProjectModal = ({
     expanded: {
       x: 0,
       y: 0,
-      width: '100vw',
-      height: '100vh',
+      width: `${containerWidth}px`,
+      height: `${containerHeight}px`,
     },
   };
 

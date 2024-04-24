@@ -1,20 +1,21 @@
 import { type RefObject, useMemo } from 'react';
 import { useElementSize } from './use-element-size';
-import { useWindowSize } from './use-window-size';
 
-export const useRandomPosition = <T extends HTMLElement>(
+export const useRandomPosition = <T extends HTMLElement, U extends HTMLElement>(
   elementRef: RefObject<T>,
+  containerRef: RefObject<U>,
 ) => {
   const { elementWidth, elementHeight } = useElementSize(elementRef);
-  const { windowWidth, windowHeight } = useWindowSize();
+  const { elementWidth: containerWidth, elementHeight: containerHeight } =
+    useElementSize(containerRef);
 
   const randomLeft = useMemo(
-    () => Math.random() * (windowWidth - elementWidth),
-    [elementWidth, windowWidth],
+    () => Math.random() * (containerWidth - elementWidth),
+    [elementWidth, containerWidth],
   );
   const randomTop = useMemo(
-    () => Math.random() * (windowHeight - elementHeight),
-    [elementHeight, windowHeight],
+    () => Math.random() * (containerHeight - elementHeight),
+    [elementHeight, containerHeight],
   );
 
   return { randomLeft, randomTop };
