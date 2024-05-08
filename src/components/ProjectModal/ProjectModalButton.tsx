@@ -19,6 +19,7 @@ export const ProjectModalButton = ({
         xmlns="http://www.w3.org/2000/svg"
         className="h-auto w-3 fill-blue-500 transition-colors group-hover:fill-white"
         animate={{ rotate: isModalExpanded ? 0 : 45 }}
+        aria-hidden="true"
       >
         <g strokeWidth="0"></g>
         <g strokeLinecap="round" strokeLinejoin="round"></g>
@@ -29,6 +30,9 @@ export const ProjectModalButton = ({
           ></path>
         </g>
       </motion.svg>
+      <span className="sr-only">{`${
+        isModalExpanded ? 'Reduce' : 'Expand'
+      } modal`}</span>
     </button>
   );
 };
