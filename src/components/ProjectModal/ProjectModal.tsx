@@ -63,8 +63,7 @@ export const ProjectModal = <T extends HTMLElement>({
       throw new Error('modalRef is not assigned');
     }
 
-    const modalStyle = window.getComputedStyle(modal);
-    const height = modalStyle.height;
+    const { height } = window.getComputedStyle(modal);
 
     setRestHeight(height);
   };
@@ -75,21 +74,15 @@ export const ProjectModal = <T extends HTMLElement>({
     const modal = modalRef.current;
 
     if (!modal) {
-      throw new Error('containerRef is not assigned');
+      throw new Error('modalRef is not assigned');
     }
 
-    const modalStyle = window.getComputedStyle(modal);
-    const top = parseInt(modalStyle.top, 10);
-    const left = parseInt(modalStyle.left, 10);
-
-    const transformValues = modal.style.transform.match(/[-]?\d*\.?\d+/g) ?? [];
-
-    const translateX = parseInt(transformValues[0] ?? '0', 10);
-    const translateY = parseInt(transformValues[1] ?? '0', 10);
+    const { transform } = window.getComputedStyle(modal);
+    const { m41: translateX, m42: translateY } = new WebKitCSSMatrix(transform);
 
     setDraggedPosition({
-      left: `${left + translateX}px`,
-      top: `${top + translateY}px`,
+      left: `${translateX}px`,
+      top: `${translateY}px`,
     });
   };
 
